@@ -25,7 +25,10 @@ Installation
 >     $ git clone https://github.com/zoborg/symfony-demo
 >     $ cd symfony-demo/
 >     $ composer install --no-interaction
->     $
+
+When you have read below you should execute below (this may take some time to load).
+
+>     $ ./bin/console app:loadreport
 
 The Challenge
 -----
@@ -93,7 +96,13 @@ the customer, therefore any increased latency to this process is quite acceptabl
 2)  TestQueryCommand (run as ./bin/console app:testquery) - this command simulates a typical SQL (via Doctrine) lookup
 that a user would trigger whilst using our app online.  Microtime has been put around the functions to estimate how long
 the queries can take.  As you will see when running the command, with 115K records this querying can take 5-10 seconds
-which is too slow to run online.
+which is too slow to run online. (example output below).
+
+>  Campaign Performance took 2.1192889213562 to load 4306 records
+>  Ad Group Stats took 0.7291362285614 to load 709 records
+>  Campaign Stats took 0.70429015159607 to load 358 records
+>  Sku Stats took 0.57318997383118 to load 123 records
+>  Total : 4.1263418197632
 
 What I would like you to do is find a way to get the same results from 2), however significantly improve the time it takes
 to return the SAME results.  One suggested way this could be achieved (or welcome to come up with other solutions) is,
@@ -102,6 +111,8 @@ by creating some summary view of the data,  e.g. as keyword/matchtype is not rel
 when this other table would then be populated is up to you.
 
 Finally you would create alternatives to the methods in the CampaignPerformanceRepository, which could be called by the
-test script to show improvements.  Please make sure you show some way  that the data is the same :).
+test script to show improvements.  Please make sure you confirm that the data of the improved method is the same as the
+original.
 
-This test is to simulate a real working relationship with us, so feel free to ask questions as required.
+This test is to simulate a typical problem in a typical working relationship, as you would if we worked together feel
+free to ask questions.

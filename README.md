@@ -1,10 +1,9 @@
-Symfony Demo Application
+Developer Test Application
 ========================
 
-The "Symfony Demo Application" is a reference application created to show how
-to develop Symfony applications following the recommended best practices.
-
-[![Build Status](https://travis-ci.org/symfony/symfony-demo.svg?branch=master)](https://travis-ci.org/symfony/symfony-demo)
+This is originally a fork of the "Symfony Demo Application", this test can be run entirely on the command line
+and thus no webserver is needed.  The application comes with a sqlite database, however you can replace this
+with another DB if it suits your needs.
 
 Requirements
 ------------
@@ -13,71 +12,94 @@ Requirements
   * PDO-SQLite PHP extension enabled;
   * and the [usual Symfony application requirements](http://symfony.com/doc/current/reference/requirements.html).
 
-If unsure about meeting these requirements, download the demo application and
-browse the `http://localhost:8000/config.php` script to get more detailed
-information.
 
 Installation
 ------------
 
-[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
 
-First, install the [Symfony Installer](https://github.com/symfony/symfony-installer)
-if you haven't already. Then, install the Symfony Demo Application executing
-this command anywhere in your system:
-
-```bash
-$ symfony demo
-
-# if you're using Windows:
-$ php symfony demo
-```
-
-If the `demo` command is not available, update your Symfony Installer to the
-most recent version executing the `symfony self-update` command.
-
-> **NOTE**
->
 > If you can't use the Symfony Installer, download and install the demo
 > application using Git and Composer:
 >
 >     $ git clone https://github.com/symfony/symfony-demo
 >     $ cd symfony-demo/
 >     $ composer install --no-interaction
+>     $
 
-Usage
+The Challenge
 -----
 
-There is no need to configure a virtual host in your web server to access the application.
-Just use the built-in web server:
+This is typical data challenge we need to solve within our application, we process large datasets and will then present
+a summary view to the user.  Often this will use aggregate functions (E.g. sum) to create these summary views, however
+with larger accounts, or as the data grows over time these aggregate views become inefficient and a alternative needs to
+be found.
 
-```bash
-$ cd symfony-demo/
-$ php bin/console server:run
-```
+In a typical PPC Campaign you will have a structure such as follows
 
-This command will start a web server for the Symfony application. Now you can
-access the application in your browser at <http://localhost:8000>. You can
-stop the built-in web server by pressing `Ctrl + C` while you're in the
-terminal.
+Campaign
+    - Adgroup 1 (Many to 1 relationship with a Campaign)
+        - Keywords (Many to 1 relationship to a Adgroup)
+            Keyword 1
+            Keyword 2
+            Keyword 3
+        - SKU (e.g. a particular product) (Many to 1 relationship with a adgroup)
+            Mobile Phone Case
+            Other Mobile Phone Case
+    - Adgroup 2
+        - Keywords
+            Keyword 1
+            Keyword 2
+            Keyword 3
+        - SKU (e.g. a particular product)
+            Mobile Phone Case
+            Other Mobile Phone Case
 
-> **NOTE**
->
-> If you want to use a fully-featured web server (like Nginx or Apache) to run
-> Symfony Demo application, configure it to point at the `web/` directory of the project.
-> For more details, see:
-> http://symfony.com/doc/current/cookbook/configuration/web_server_configuration.html
+We will get reports similar to this (To simplify we are only using clicks/impressions, extra data in the test file
+can be ignored)  :~
 
-Troubleshooting
----------------
+Example 1.
+Campaign Name	Ad Group Name	Advertised SKU	Keyword	Match Type	Start Date	End Date    Clicks  Impressions .....
+Mobile Phone    Adroup 1        Iphone          case    broad       2016-09-01  2016-09-02  1       100
+Mobile Phone    Adroup 1        Iphone          phone   broad       2016-09-01  2016-09-02  2       200
+Mobile Phone    Adroup 1        Iphone          black   broad       2016-09-01  2016-09-02  3       300
+Mobile Phone    Adroup 1        Iphone          green   exact       2016-09-01  2016-09-02  4       400
 
-The current Symfony Demo application uses Symfony 3.x version. If you want to
-use the legacy Symfony 2.8 version, clone the Git repository and checkout the
-`v0.8.4` tag, which is the last one compatible with Symfony 2.8:
+** Please note, in the example file all above is replaced with md5 hashes for security reasons.
 
-```bash
-$ git clone https://github.com/symfony/symfony-demo
-$ cd symfony-demo/
-$ git checkout tags/v0.8.4 -b v0.8.4
-$ composer install
-```
+
+Taking the above example data, we would wish to provide aggregate views of the data, e.g. a sum of all the clicks
+between X and Y date, grouped by the SKU.  Or give me the sum of clicks, impressions grouped by the day of month.  What you
+will notice in almost all cases the KEYWORD/MATCHTYPE is not relevant to the group.  E.g. if we ignored the keyword & matchtype
+columns, the aggregated data could be.
+
+Example 2.
+Campaign Name	Ad Group Name	Advertised SKU	Start Date	End Date    Clicks  Impressions .....
+Mobile Phone    Adroup 1        Iphone          2016-09-01  2016-09-02  10       1000
+
+If we were to query this summary view of the data, we could achieve the same results as querying the full data
+however significantly less rows would need to scanned.
+
+Included in this test is 2 command's
+
+1)  LoadReportCommand (run as ./bin/console app:loadreport), this command will load the testdata into the database.  This
+test data is stored under var/data/testdata.txt and contains approximately 115000 rows of data, a typical large account
+where the data would be updated twice a day.
+
+When you run this command you will notice it calls the AppBundle:Utils:CampaignPerformanceProcessor  to load
+this data in as efficient way as possible.  In a real environment this is done via a queue and as such has no impact to
+the customer, therefore any increased latency to this process is quite acceptable.
+
+2)  TestQueryCommand (run as ./bin/console app:testquery) - this command simulates a typical SQL (via Doctrine) lookup
+that a user would trigger whilst using our app online.  Microtime has been put around the functions to estimate how long
+the queries can take.  As you will see when running the command, with 115K records this querying can take 5-10 seconds
+which is too slow to run online.
+
+What I would like you to do is find a way to get the same results from 2), however significantly improve the time it takes
+to return the SAME results.  One suggested way this could be achieved (or welcome to come up with other solutions) is,
+by creating some summary view of the data,  e.g. as keyword/matchtype is not relevant.  This could be a database view
+(although would need to swap sqlite out with another database), or create a table to hold this summary view.  How/
+when this other table would then be populated is up to you.
+
+Finally you would create alternatives to the methods in the CampaignPerformanceRepository, which could be called by the
+test script to show improvements.  Please make sure you show some way  that the data is the same :).
+
+This test is to simulate a real working relationship with us, so feel free to ask questions as required.

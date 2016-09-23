@@ -14,6 +14,7 @@ namespace AppBundle\DataFixtures\ORM;
 use AppBundle\Entity\User;
 use AppBundle\Entity\Post;
 use AppBundle\Entity\Comment;
+use AppBundle\Entity\Accounts;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -54,6 +55,13 @@ class LoadFixtures implements FixtureInterface, ContainerAwareInterface
         $encodedPassword = $passwordEncoder->encodePassword($johnUser, 'kitten');
         $johnUser->setPassword($encodedPassword);
         $manager->persist($johnUser);
+
+
+        $account = new Accounts();
+        $account->setUser($johnUser);
+        $account->setUsername('john_user');
+
+        $manager->persist($account);
 
         $annaAdmin = new User();
         $annaAdmin->setUsername('anna_admin');

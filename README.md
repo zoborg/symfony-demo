@@ -5,6 +5,8 @@ This is originally a fork of the "Symfony Demo Application", this test can be ru
 and thus no webserver is needed.  The application comes with a sqlite database, however you can replace this
 with another DB if it suits your needs.
 
+Please note, this code may have many unneccesary files/variables as it is just for testing purposes :)
+
 Requirements
 ------------
 
@@ -20,7 +22,7 @@ Installation
 > If you can't use the Symfony Installer, download and install the demo
 > application using Git and Composer:
 >
->     $ git clone https://github.com/symfony/symfony-demo
+>     $ git clone https://github.com/zoborg/symfony-demo
 >     $ cd symfony-demo/
 >     $ composer install --no-interaction
 >     $
@@ -57,11 +59,11 @@ We will get reports similar to this (To simplify we are only using clicks/impres
 can be ignored)  :~
 
 Example 1.
-Campaign Name	Ad Group Name	Advertised SKU	Keyword	Match Type	Start Date	End Date    Clicks  Impressions .....
-Mobile Phone    Adroup 1        Iphone          case    broad       2016-09-01  2016-09-02  1       100
-Mobile Phone    Adroup 1        Iphone          phone   broad       2016-09-01  2016-09-02  2       200
-Mobile Phone    Adroup 1        Iphone          black   broad       2016-09-01  2016-09-02  3       300
-Mobile Phone    Adroup 1        Iphone          green   exact       2016-09-01  2016-09-02  4       400
+>Campaign Name	Ad Group Name	Advertised SKU	Keyword	Match Type	Start Date	End Date    Clicks  Impressions .....
+>Mobile Phone    Adroup 1        Iphone          case    broad       2016-09-01  2016-09-02  1       100
+>Mobile Phone    Adroup 1        Iphone          phone   broad       2016-09-01  2016-09-02  2       200
+>Mobile Phone    Adroup 1        Iphone          black   broad       2016-09-01  2016-09-02  3       300
+>Mobile Phone    Adroup 1        Iphone          green   exact       2016-09-01  2016-09-02  4       400
 
 ** Please note, in the example file all above is replaced with md5 hashes for security reasons.
 
@@ -72,8 +74,8 @@ will notice in almost all cases the KEYWORD/MATCHTYPE is not relevant to the gro
 columns, the aggregated data could be.
 
 Example 2.
-Campaign Name	Ad Group Name	Advertised SKU	Start Date	End Date    Clicks  Impressions .....
-Mobile Phone    Adroup 1        Iphone          2016-09-01  2016-09-02  10       1000
+>Campaign Name	Ad Group Name	Advertised SKU	Start Date	End Date    Clicks  Impressions .....
+>Mobile Phone    Adroup 1        Iphone          2016-09-01  2016-09-02  10       1000
 
 If we were to query this summary view of the data, we could achieve the same results as querying the full data
 however significantly less rows would need to scanned.

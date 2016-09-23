@@ -102,11 +102,11 @@ that a user would trigger whilst using our app online.  Microtime has been put a
 the queries can take.  As you will see when running the command, with 115K records this querying can take 5-10 seconds
 which is too slow to run online. (example output below).
 
->  Campaign Performance took 2.1192889213562 to load 4306 records
->  Ad Group Stats took 0.7291362285614 to load 709 records
->  Campaign Stats took 0.70429015159607 to load 358 records
->  Sku Stats took 0.57318997383118 to load 123 records
->  Total : 4.1263418197632
+>   $ Campaign Performance took 2.1192889213562 to load 4306 records
+>   $ Ad Group Stats took 0.7291362285614 to load 709 records
+>   $ Campaign Stats took 0.70429015159607 to load 358 records
+>   $ Sku Stats took 0.57318997383118 to load 123 records
+>   $ Total : 4.1263418197632
 
 What I would like you to do is find a way to get the same results from 2), however significantly improve the time it takes
 to return the SAME results.  One suggested way this could be achieved (or welcome to come up with other solutions) is,

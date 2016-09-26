@@ -9,6 +9,9 @@
 namespace AppBundle\Utils;
 
 
+use AppBundle\Entity\Accounts;
+use AppBundle\Entity\Cache\CacheCampaignPerformance;
+use AppBundle\Entity\CampaignPerformanceRepository;
 use AppBundle\Entity\Campaigns;
 use AppBundle\Entity\Adgroups;
 use AppBundle\Entity\CampaignPerformance;
@@ -18,18 +21,23 @@ class CampaignPerformanceProcessor
 
     private $em;
 
-    public function __construct(\Doctrine\ORM\EntityManager $em) {
+    /**
+     * @var CampaignPerformanceRepository
+     */
+    private $campaignPerformanceRepository;
+
+    public function __construct(\Doctrine\ORM\EntityManager $em, CampaignPerformanceRepository $campaignPerformanceRepository) {
         $this->em = $em;
+        $this->campaignPerformanceRepository = $campaignPerformanceRepository;
     }
 
 
     private $batchSize = 2000;
 
-    public function processReport($fileName, $accounts) {
+    public function processReport($fileName, Accounts $accounts) {
 
         try {
             $time_start = microtime(true);
-
             $file = new \SplFileObject($fileName, "r");
             $firstLine = $file->fgets();
 
@@ -45,31 +53,11 @@ class CampaignPerformanceProcessor
 
             $entitiesCreated = 0;
             while ($file && !$file->eof()) {
-
-
                 $row = $file->fgets();
-//                preg_replace( "/\r|\n/", "", $row );
                 $data = explode("\t", $row);
-//
-//                $data[0] = md5($data[0]);
-//                $data[1] = md5($data[1]);
-//                $data[2] = md5($data[2]);
-//                $data[3] = md5($data[3]);
-//
-//                $back = implode("\t", $data);
-//
-//                echo $back;
-//
-//                continue;
-
-
-
                 if (is_array($data) && $data[0]) {
-
-
                     $startDate = $data[5];
                     $endDate = $data[6];
-
 
                     if (preg_match('/^(\d{1,2}\/\d{1,2}\/\d{1,2})\s/', $startDate, $matches)) {
                         $startDate = \DateTime::createFromFormat($shortDateFormat, $matches[1]);
@@ -114,13 +102,11 @@ class CampaignPerformanceProcessor
                     $entitiesCreated ++;
                     if (($entitiesCreated % $this->batchSize) === 0) {
                         $this->em->flush();
-//                        $this->echo_memory_usage();
                         echo "Flushing at $entitiesCreated\n";
                         foreach($batches as $entity) {
                             $this->em->detach($entity);
                         }
                         $batches = [];
-//                        exit;
                     }
 
                 }
@@ -132,16 +118,13 @@ class CampaignPerformanceProcessor
             foreach($batches as $entity) {
                 $this->em->detach($entity);
             }
-            $batchCheckSums = [];
-            $batches = [];
-
-
             $this->em->flush();
 
             $time_end = microtime(true);
             $time = $time_end - $time_start;
             echo "Account ".$accounts->getUsername()." took $time secs to load CPR";
 
+            $this->saveCache($accounts->getId());
         } catch(\Exception $e) {
                 echo "Failed to load data ".$e->getMessage();
                 echo $e->getTraceAsString();
@@ -150,17 +133,20 @@ class CampaignPerformanceProcessor
         return true;
     }
 
-    private function echo_memory_usage() {
-        $mem_usage = memory_get_usage(true);
+    private function saveCache($accountId){
 
-        if ($mem_usage < 1024)
-            echo $mem_usage." bytes";
-        elseif ($mem_usage < 1048576)
-            echo round($mem_usage/1024,2)." kilobytes";
-        else
-            echo round($mem_usage/1048576,2)." megabytes";
-
-        echo "\n";
+        foreach ($this->campaignPerformanceRepository->campaignPerformance($accountId) as $item) {
+            $ccp = new CacheCampaignPerformance(
+                $accountId,
+                $item['impressions'],
+                $item['clicks'],
+                $item['id'],
+                $item['baseUnitCost'],
+                $item['startDt']
+            );
+            $this->em->persist($ccp);
+        }
+        $this->em->flush();
     }
 
 }

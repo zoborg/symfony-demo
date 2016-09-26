@@ -11,6 +11,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Entity\Accounts;
 use AppBundle\Entity\CampaignPerformanceRepository;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -42,6 +43,7 @@ class TestQueryCommand extends ContainerAwareCommand
 
         $em = $this->getContainer()->get('doctrine')->getManager();
 
+        /** @var Accounts $account */
         $account = $em->getRepository('AppBundle:Accounts')->findOneBy(['username' => $username]);
 
 
@@ -50,34 +52,35 @@ class TestQueryCommand extends ContainerAwareCommand
         } else {
             /** @var CampaignPerformanceRepository $repo */
             $repo = $em->getRepository('AppBundle:CampaignPerformance');
-            # Following queries would all be run to generate a real time report for users
-            # Normally filters can be added
-
 
             $initial_time_start = $time_start = microtime(true);
-            $cp = $repo->campaignPerformance($account->getId(), []);
+            $cp = $repo->campaignPerformance($account->getId());
             $time_end = microtime(true);
             $time = $time_end - $time_start;
+            var_dump($cp[0]);
             echo "Campaign Performance took $time to load ".count($cp)." records\n";
 
 
             $time_start = microtime(true);
-            $cp = $repo->adgroupStats($account->getId(), []);
+            $cp = $repo->adgroupStats($account->getId());
             $time_end = microtime(true);
             $time = $time_end - $time_start;
+            var_dump($cp[0]);
             echo "Ad Group Stats took $time to load ".count($cp)." records\n";
 
             $time_start = microtime(true);
-            $cp = $repo->campaignStats($account->getId(), []);
+            $cp = $repo->campaignStats($account->getId());
             $time_end = microtime(true);
             $time = $time_end - $time_start;
+            var_dump($cp[0]);
             echo "Campaign Stats took $time to load ".count($cp)." records\n";
 
 
             $time_start = microtime(true);
-            $cp = $repo->skuStats($account->getId(), []);
+            $cp = $repo->skuStats($account->getId());
             $time_end = microtime(true);
             $time = $time_end - $time_start;
+            var_dump($cp[0]);
             echo "Sku Stats took $time to load ".count($cp)." records\n";
 
 

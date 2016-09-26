@@ -11,6 +11,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Utils\CampaignPerformanceProcessor;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -53,6 +54,7 @@ class LoadReportCommand extends ContainerAwareCommand
         if(!$account) {
             die("Cannot load user");
         } else {
+            /** @var CampaignPerformanceProcessor $service */
             $service = $this->getContainer()->get('cpr');
             $service->processReport($file, $account);
         }

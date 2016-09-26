@@ -11,6 +11,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Entity\CampaignPerformanceRepository;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -47,6 +48,7 @@ class TestQueryCommand extends ContainerAwareCommand
         if(!$account) {
             die("Cannot load user");
         } else {
+            /** @var CampaignPerformanceRepository $repo */
             $repo = $em->getRepository('AppBundle:CampaignPerformance');
             # Following queries would all be run to generate a real time report for users
             # Normally filters can be added

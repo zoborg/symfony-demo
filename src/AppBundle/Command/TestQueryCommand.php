@@ -64,14 +64,12 @@ class TestQueryCommand extends ContainerAwareCommand
             $cp = $repo->adgroupStats($account->getId());
             $time_end = microtime(true);
             $time = $time_end - $time_start;
-            var_dump($cp[0]);
             echo "Ad Group Stats took $time to load ".count($cp)." records\n";
 
             $time_start = microtime(true);
             $cp = $repo->campaignStats($account->getId());
             $time_end = microtime(true);
             $time = $time_end - $time_start;
-            var_dump($cp[0]);
             echo "Campaign Stats took $time to load ".count($cp)." records\n";
 
 

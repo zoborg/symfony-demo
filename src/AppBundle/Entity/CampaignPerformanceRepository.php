@@ -4,6 +4,7 @@ namespace AppBundle\Entity;
 
 use AppBundle\Entity\Cache\CacheAdGroupStats;
 use AppBundle\Entity\Cache\CacheCampaignPerformance;
+use AppBundle\Entity\Cache\CacheCampaignStats;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\EntityRepository;
 
@@ -107,9 +108,10 @@ class CampaignPerformanceRepository extends EntityRepository
 
     /**
      * @param integer $accountId
+     * @param bool $fromCache
      * @return array
      */
-    public function campaignStats($accountId)
+    public function campaignStats($accountId, $fromCache = true)
     {
         $qb = $this->defaultQb($accountId);
         $qb->addSelect('d.name as campaign')
@@ -117,6 +119,20 @@ class CampaignPerformanceRepository extends EntityRepository
             ->addSelect('d.id as campaignId')
             ->addGroupBy('campaignId')
             ->orderBy('campaign');
+        if($fromCache){
+             $qb = $this->getEntityManager()->createQueryBuilder();
+            $qb->from(CacheCampaignStats::class, 'a');
+            $qb
+                ->addSelect('a.impressions')
+                ->addSelect('a.clicks as clicks')
+                ->addSelect('a.skuId as id')
+                ->addSelect('a.baseUnitCost as baseUnitCost')
+                ->addSelect('a.campaign')
+                ->addSelect('a.campaignId')
+                ->addSelect('a.name');
+            $qb->where('a.accountId = :account')
+                ->setParameter('account', $accountId);
+        }
 
         $results = $qb->getQuery()->useQueryCache(false)
             ->useResultCache(false)

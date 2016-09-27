@@ -12,6 +12,7 @@ namespace AppBundle\Utils;
 use AppBundle\Entity\Accounts;
 use AppBundle\Entity\Cache\CacheAdGroupStats;
 use AppBundle\Entity\Cache\CacheCampaignPerformance;
+use AppBundle\Entity\Cache\CacheCampaignStats;
 use AppBundle\Entity\CampaignPerformanceRepository;
 use AppBundle\Entity\Campaigns;
 use AppBundle\Entity\Adgroups;
@@ -168,7 +169,7 @@ class CampaignPerformanceProcessor
         }
         $this->em->flush();
         foreach ($this->campaignPerformanceRepository->adgroupStats($accountId, false) as $item) {
-            $ccp = new CacheAdGroupStats(
+            $cas = new CacheAdGroupStats(
                 $accountId,
                 $item['impressions'],
                 $item['clicks'],
@@ -178,7 +179,21 @@ class CampaignPerformanceProcessor
                 $item['adgroup'],
                 $item['adgroupId']
             );
-            $this->em->persist($ccp);
+            $this->em->persist($cas);
+        }
+        $this->em->flush();
+         foreach ($this->campaignPerformanceRepository->campaignStats($accountId, false) as $item) {
+            $ccs = new CacheCampaignStats(
+                $accountId,
+                $item['impressions'],
+                $item['clicks'],
+                $item['id'],
+                $item['baseUnitCost'],
+                $item['name'],
+                $item['campaign'],
+                $item['campaignId']
+            );
+            $this->em->persist($ccs);
         }
         $this->em->flush();
     }

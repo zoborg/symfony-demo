@@ -2,14 +2,18 @@
 namespace AppBundle\Entity\Cache;
 
 use AppBundle\Entity\Common;
+use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints\DateTime;
 
 /**
  * Class CacheCampaignPerformance
  * @package AppBundle\Entity\Cache
  *
- * @ORM\Entity()
  * @ORM\Table(name="cache_campaign_performance")
+ * @ORM\Entity()
+ * @ORM\HasLifecycleCallbacks
  */
 class CacheCampaignPerformance extends Common
 {
@@ -17,23 +21,33 @@ class CacheCampaignPerformance extends Common
         $accountId,
         $impressions,
         $clicks,
-        $id,
+        $skuId,
         $baseUnitCost,
-        $startDt
+        \DateTime $startDt
     ) {
         $this->accountId = $accountId;
         $this->impressions = $impressions;
         $this->clicks = $clicks;
-        $this->id = $id;
+        $this->skuId = $skuId;
         $this->baseUnitCost = $baseUnitCost;
-        $this->startDt = $startDt;
+        if($startDt){
+            $this->startDt = $startDt;
+        }
     }
 
     /**
      * @var integer
      *
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=false)
      * @ORM\Id()
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    private $id;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(type="integer")
      */
     private $accountId;
 
@@ -56,7 +70,7 @@ class CacheCampaignPerformance extends Common
      *
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private $skuId;
 
     /**
      * @var float
@@ -66,10 +80,9 @@ class CacheCampaignPerformance extends Common
     private $baseUnitCost;
 
     /**
-     * @var integer
+     * @var \DateTime
      *
-     * @ORM\Column(type="datetime")
-     * @ORM\Id()
+     * @ORM\Column(name="start_date", type="date", nullable=false)
      */
     private $startDt;
 }

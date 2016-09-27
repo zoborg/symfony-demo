@@ -103,6 +103,9 @@ class CampaignPerformanceProcessor
                     if (($entitiesCreated % $this->batchSize) === 0) {
                         $this->em->flush();
                         echo "Flushing at $entitiesCreated\n";
+                        //if ($entitiesCreated > 3000){
+                        //    break;
+                        //}
                         foreach($batches as $entity) {
                             $this->em->detach($entity);
                         }

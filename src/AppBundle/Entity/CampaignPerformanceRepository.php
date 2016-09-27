@@ -2,6 +2,7 @@
 
 namespace AppBundle\Entity;
 
+use AppBundle\Entity\Cache\CacheCampaignPerformance;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\EntityRepository;
 
@@ -14,10 +15,16 @@ class CampaignPerformanceRepository extends EntityRepository {
      */
     public function campaignPerformance($accountId) {
 
-        $qb = $this->defaultQb($accountId);
-        $qb->addSelect('a.startDate as startDt')
-            ->addGroupBy('startDt')
-            ->orderBy('startDt', 'asc');
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->from(CacheCampaignPerformance::class, 'a')
+            ->addSelect('a.impressions')
+            ->addSelect('a.clicks as clicks')
+            ->addSelect('a.skuId as id')
+            ->addSelect('a.baseUnitCost as baseUnitCost')
+            ->addSelect('a.startDt');
+        $qb->where('a.accountId = :account')
+        ->setParameter('account', $accountId);
+
 
         $results = $qb->getQuery()
             ->useQueryCache(false)

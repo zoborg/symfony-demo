@@ -2,34 +2,45 @@
 
 namespace AppBundle\Entity;
 
+use AppBundle\Entity\Cache\CacheAdGroupStats;
 use AppBundle\Entity\Cache\CacheCampaignPerformance;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\EntityRepository;
 
-class CampaignPerformanceRepository extends EntityRepository {
+class CampaignPerformanceRepository extends EntityRepository
+{
 
 
     /**
-     * @param integer $accountId
+     * @param $accountId
+     * @param bool $fromCache
      * @return array
      */
-    public function campaignPerformance($accountId) {
+    public function campaignPerformance($accountId, $fromCache = true)
+    {
 
-        $qb = $this->getEntityManager()->createQueryBuilder();
-        $qb->from(CacheCampaignPerformance::class, 'a')
-            ->addSelect('a.impressions')
-            ->addSelect('a.clicks as clicks')
-            ->addSelect('a.skuId as id')
-            ->addSelect('a.baseUnitCost as baseUnitCost')
-            ->addSelect('a.startDt');
-        $qb->where('a.accountId = :account')
-        ->setParameter('account', $accountId);
+        $qb = $this->defaultQb($accountId);
+        $qb->addSelect('a.startDate as startDt')
+            ->addGroupBy('startDt')
+            ->orderBy('startDt', 'asc');
 
+        if ($fromCache) {
+            $qb = $this->getEntityManager()->createQueryBuilder();
+            $qb->from(CacheCampaignPerformance::class, 'a')
+                ->addSelect('a.impressions')
+                ->addSelect('a.clicks as clicks')
+                ->addSelect('a.skuId as id')
+                ->addSelect('a.baseUnitCost as baseUnitCost')
+                ->addSelect('a.startDt');
+            $qb->where('a.accountId = :account')
+                ->setParameter('account', $accountId);
+        }
 
         $results = $qb->getQuery()
             ->useQueryCache(false)
             ->useResultCache(false)
             ->getResult();
+
         return $results;
 
     }
@@ -38,7 +49,8 @@ class CampaignPerformanceRepository extends EntityRepository {
      * @param integer $accountId
      * @return array
      */
-    public function skuStats($accountId) {
+    public function skuStats($accountId)
+    {
 
         $cacheName = md5($accountId.'skustats');
         $qb = $this->defaultQb($accountId);
@@ -59,15 +71,32 @@ class CampaignPerformanceRepository extends EntityRepository {
 
     /**
      * @param integer $accountId
+     * @param bool $fromCache
      * @return array
      */
-    public function adgroupStats($accountId) {
+    public function adgroupStats($accountId, $fromCache = true)
+    {
         $qb = $this->defaultQb($accountId);
         $qb->addSelect('c.name as adgroup')
             ->addSelect('c.name as name')
             ->addSelect('c.id as adgroupId')
             ->addGroupBy('adgroup');
 
+        if($fromCache){
+            $qb = $this->getEntityManager()->createQueryBuilder();
+            $qb->from(CacheAdGroupStats::class, 'a');
+            $qb
+                ->addSelect('a.impressions')
+                ->addSelect('a.clicks as clicks')
+                ->addSelect('a.skuId as id')
+                ->addSelect('a.baseUnitCost as baseUnitCost')
+                ->addSelect('a.adGroup as adgroup')
+                ->addSelect('a.adGroupId as adgroupId')
+                ->addSelect('a.name');
+            $qb->where('a.accountId = :account')
+                ->setParameter('account', $accountId);
+
+        }
         $results = $qb->getQuery()->useQueryCache(false)
             ->useResultCache(false)
             ->getResult();
@@ -80,7 +109,8 @@ class CampaignPerformanceRepository extends EntityRepository {
      * @param integer $accountId
      * @return array
      */
-    public function campaignStats($accountId) {
+    public function campaignStats($accountId)
+    {
         $qb = $this->defaultQb($accountId);
         $qb->addSelect('d.name as campaign')
             ->addSelect('d.name as name')
@@ -99,10 +129,11 @@ class CampaignPerformanceRepository extends EntityRepository {
      * @param integer $accountId
      * @return \Doctrine\ORM\QueryBuilder
      */
-    private function defaultQb($accountId) {
+    private function defaultQb($accountId)
+    {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->
-            select('sum(a.impressions) as impressions')
+        select('sum(a.impressions) as impressions')
             ->addSelect('sum(a.clicks) as clicks')
             ->addSelect('e.id as id')
             ->addSelect('e.unitCost as baseUnitCost')

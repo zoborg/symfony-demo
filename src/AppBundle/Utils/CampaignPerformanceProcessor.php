@@ -10,13 +10,14 @@ namespace AppBundle\Utils;
 
 
 use AppBundle\Entity\Accounts;
+use AppBundle\Entity\Cache\CacheAdGroupStats;
 use AppBundle\Entity\Cache\CacheCampaignPerformance;
 use AppBundle\Entity\CampaignPerformanceRepository;
 use AppBundle\Entity\Campaigns;
 use AppBundle\Entity\Adgroups;
 use AppBundle\Entity\CampaignPerformance;
 
-class CampaignPerformanceProcessor 
+class CampaignPerformanceProcessor
 {
 
     private $em;
@@ -26,7 +27,10 @@ class CampaignPerformanceProcessor
      */
     private $campaignPerformanceRepository;
 
-    public function __construct(\Doctrine\ORM\EntityManager $em, CampaignPerformanceRepository $campaignPerformanceRepository) {
+    public function __construct(
+        \Doctrine\ORM\EntityManager $em,
+        CampaignPerformanceRepository $campaignPerformanceRepository
+    ) {
         $this->em = $em;
         $this->campaignPerformanceRepository = $campaignPerformanceRepository;
     }
@@ -34,7 +38,8 @@ class CampaignPerformanceProcessor
 
     private $batchSize = 2000;
 
-    public function processReport($fileName, Accounts $accounts) {
+    public function processReport($fileName, Accounts $accounts)
+    {
 
         try {
             $time_start = microtime(true);
@@ -74,10 +79,23 @@ class CampaignPerformanceProcessor
                     } else {
                         throw new \Exception('Invalid Time format');
                     }
-                 
-                    $campaignEntity = $this->em->getRepository('AppBundle:Campaigns')->findOrAdd($accounts, $data[0], true);
-                    $adGroupEntity = $this->em->getRepository('AppBundle:Adgroups')->findOrAdd($campaignEntity, $data[1], true);
-                    $skuEntity = $this->em->getRepository('AppBundle:Sku')->findOrAdd($accounts, $data[2], ['ppc' => true], true);
+
+                    $campaignEntity = $this->em->getRepository('AppBundle:Campaigns')->findOrAdd(
+                        $accounts,
+                        $data[0],
+                        true
+                    );
+                    $adGroupEntity = $this->em->getRepository('AppBundle:Adgroups')->findOrAdd(
+                        $campaignEntity,
+                        $data[1],
+                        true
+                    );
+                    $skuEntity = $this->em->getRepository('AppBundle:Sku')->findOrAdd(
+                        $accounts,
+                        $data[2],
+                        ['ppc' => true],
+                        true
+                    );
 
                     # Use proxies which are not full entities to save memory in downloading
                     $skuProxy = $this->em->getReference('AppBundle:Sku', $skuEntity->getId());
@@ -99,14 +117,11 @@ class CampaignPerformanceProcessor
 
                     $this->em->persist($campaignPerformanceEntity);
 
-                    $entitiesCreated ++;
+                    $entitiesCreated++;
                     if (($entitiesCreated % $this->batchSize) === 0) {
                         $this->em->flush();
                         echo "Flushing at $entitiesCreated\n";
-                        //if ($entitiesCreated > 3000){
-                        //    break;
-                        //}
-                        foreach($batches as $entity) {
+                        foreach ($batches as $entity) {
                             $this->em->detach($entity);
                         }
                         $batches = [];
@@ -118,7 +133,7 @@ class CampaignPerformanceProcessor
 
             $this->em->flush();
             echo "Flushed at $entitiesCreated";
-            foreach($batches as $entity) {
+            foreach ($batches as $entity) {
                 $this->em->detach($entity);
             }
             $this->em->flush();
@@ -128,17 +143,19 @@ class CampaignPerformanceProcessor
             echo "Account ".$accounts->getUsername()." took $time secs to load CPR";
 
             $this->saveCache($accounts->getId());
-        } catch(\Exception $e) {
-                echo "Failed to load data ".$e->getMessage();
-                echo $e->getTraceAsString();
-                throw $e;
+        } catch (\Exception $e) {
+            echo "Failed to load data ".$e->getMessage();
+            echo $e->getTraceAsString();
+            throw $e;
         }
+
         return true;
     }
 
-    private function saveCache($accountId){
+    private function saveCache($accountId)
+    {
 
-        foreach ($this->campaignPerformanceRepository->campaignPerformance($accountId) as $item) {
+        foreach ($this->campaignPerformanceRepository->campaignPerformance($accountId, false) as $item) {
             $ccp = new CacheCampaignPerformance(
                 $accountId,
                 $item['impressions'],
@@ -146,6 +163,20 @@ class CampaignPerformanceProcessor
                 $item['id'],
                 $item['baseUnitCost'],
                 $item['startDt']
+            );
+            $this->em->persist($ccp);
+        }
+        $this->em->flush();
+        foreach ($this->campaignPerformanceRepository->adgroupStats($accountId, false) as $item) {
+            $ccp = new CacheAdGroupStats(
+                $accountId,
+                $item['impressions'],
+                $item['clicks'],
+                $item['id'],
+                $item['baseUnitCost'],
+                $item['name'],
+                $item['adgroup'],
+                $item['adgroupId']
             );
             $this->em->persist($ccp);
         }

@@ -57,7 +57,6 @@ class TestQueryCommand extends ContainerAwareCommand
             $cp = $repo->campaignPerformance($account->getId());
             $time_end = microtime(true);
             $time = $time_end - $time_start;
-            var_dump($cp[0]);
             echo "Campaign Performance took $time to load ".count($cp)." records\n";
 
 

@@ -5,6 +5,7 @@ namespace AppBundle\Entity;
 use AppBundle\Entity\Cache\CacheAdGroupStats;
 use AppBundle\Entity\Cache\CacheCampaignPerformance;
 use AppBundle\Entity\Cache\CacheCampaignStats;
+use AppBundle\Entity\Cache\CacheSkuStats;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\EntityRepository;
 
@@ -48,9 +49,10 @@ class CampaignPerformanceRepository extends EntityRepository
 
     /**
      * @param integer $accountId
+     * @param bool $fromCache
      * @return array
      */
-    public function skuStats($accountId)
+    public function skuStats($accountId, $fromCache = true)
     {
 
         $cacheName = md5($accountId.'skustats');
@@ -63,6 +65,25 @@ class CampaignPerformanceRepository extends EntityRepository
             ->addSelect('e.title as title')
             ->addSelect('e.group as category')
             ->addSelect('e.brand as brand');
+
+        if($fromCache) {
+            $qb = $this->getEntityManager()->createQueryBuilder();
+            $qb->from(CacheSkuStats::class, 'a')
+            ->addSelect('a.impressions')
+                ->addSelect('a.clicks as clicks')
+                ->addSelect('a.skuId as id')
+                ->addSelect('a.baseUnitCost as baseUnitCost')
+                ->addSelect('a.name')
+                ->addSelect('a.sku')
+                ->addSelect('a.image')
+                ->addSelect('a.asin')
+                ->addSelect('a.url')
+                ->addSelect('a.title')
+                ->addSelect('a.category')
+                ->addSelect('a.brand');
+            $qb->where('a.accountId = :account')
+                ->setParameter('account', $accountId);
+        }
 
         $results = $qb->getQuery()->useResultCache(false, 3600, $cacheName)
             ->getResult();

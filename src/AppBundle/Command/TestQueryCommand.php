@@ -77,7 +77,6 @@ class TestQueryCommand extends ContainerAwareCommand
             $cp = $repo->skuStats($account->getId());
             $time_end = microtime(true);
             $time = $time_end - $time_start;
-            var_dump($cp[0]);
             echo "Sku Stats took $time to load ".count($cp)." records\n";
 
 

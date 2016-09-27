@@ -7,19 +7,19 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Class CacheAdGroupStats
+ * Class CacheSkuStats
  * @package AppBundle\Entity\Cache
  *
- * @ORM\Table(name="cache_add_group_stats")
+ * @ORM\Table(name="cache_sku_stats")
  * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks
  */
-class CacheAdGroupStats extends Common
+class CacheSkuStats extends Common
 {
     /**
      * @param $accountId
      * @param array $item
-     * @return CacheAdGroupStats
+     * @return CacheSkuStats
      */
     public static function createFromArray($accountId, array $item)
     {
@@ -29,22 +29,32 @@ class CacheAdGroupStats extends Common
             $item['clicks'],
             $item['id'],
             $item['baseUnitCost'],
+            $item['sku'],
             $item['name'],
-            $item['adgroup'],
-            $item['adgroupId']
+            $item['image'],
+            $item['asin'],
+            $item['url'],
+            $item['title'],
+            $item['category'],
+            $item['brand']
         );
     }
 
     /**
-     * CacheAdGroupStats constructor.
+     * CacheSkuStats constructor.
      * @param array $accountId
      * @param $impressions
      * @param $clicks
      * @param $skuId
      * @param $baseUnitCost
+     * @param $sku
      * @param $name
-     * @param $adGroup
-     * @param $adGroupId
+     * @param $image
+     * @param $asin
+     * @param $url
+     * @param $title
+     * @param $category
+     * @param $brand
      */
     public function __construct(
         $accountId,
@@ -52,18 +62,28 @@ class CacheAdGroupStats extends Common
         $clicks,
         $skuId,
         $baseUnitCost,
+        $sku,
         $name,
-        $adGroup,
-        $adGroupId
+        $image,
+        $asin,
+        $url,
+        $title,
+        $category,
+        $brand
     ) {
         $this->accountId = $accountId;
         $this->impressions = $impressions;
         $this->clicks = $clicks;
         $this->skuId = $skuId;
         $this->baseUnitCost = $baseUnitCost;
+        $this->sku = $sku;
         $this->name = $name;
-        $this->adGroup = $adGroup;
-        $this->adGroupId = $adGroupId;
+        $this->image = $image;
+        $this->asin = $asin;
+        $this->url = $url;
+        $this->title = $title;
+        $this->category = $category;
+        $this->brand = $brand;
     }
 
     /**
@@ -115,7 +135,7 @@ class CacheAdGroupStats extends Common
      *
      * @ORM\Column(type="string")
      */
-    private $adGroup;
+    private $sku;
 
     /**
      * @var string
@@ -125,9 +145,40 @@ class CacheAdGroupStats extends Common
     private $name;
 
     /**
-     * @var integer
+     * @var string
      *
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string")
      */
-    private $adGroupId;
+    private $image;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="asin", type="string", length=11, nullable=true)
+     */
+    private $asin;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="url", type="string", length=250, nullable=true)
+     */
+    protected $url;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="title", type="string", length=250, nullable=true)
+     */
+    protected $title;
+
+    /**
+     * @ORM\Column(name="category", type="string", length=250, nullable=true)
+     */
+    protected $category;
+
+    /**
+     * @ORM\Column(name="brand", type="string", nullable=true, length=100)
+     */
+    protected $brand;
 }

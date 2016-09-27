@@ -13,6 +13,7 @@ use AppBundle\Entity\Accounts;
 use AppBundle\Entity\Cache\CacheAdGroupStats;
 use AppBundle\Entity\Cache\CacheCampaignPerformance;
 use AppBundle\Entity\Cache\CacheCampaignStats;
+use AppBundle\Entity\Cache\CacheSkuStats;
 use AppBundle\Entity\CampaignPerformanceRepository;
 use AppBundle\Entity\Campaigns;
 use AppBundle\Entity\Adgroups;
@@ -145,7 +146,7 @@ class CampaignPerformanceProcessor
 
             $this->saveCache($accounts->getId());
         } catch (\Exception $e) {
-            echo "Failed to load data ".$e->getMessage();
+            echo "Failed to load data ".$e->getMessage()."\n";
             echo $e->getTraceAsString();
             throw $e;
         }
@@ -155,47 +156,47 @@ class CampaignPerformanceProcessor
 
     private function saveCache($accountId)
     {
-
+        $q = $this->em->createQuery(
+            'delete from AppBundle:Cache\CacheCampaignPerformance a where a.accountId = :accountId'
+        );
+        $q->setParameter('accountId', $accountId);
+        $q->execute();
         foreach ($this->campaignPerformanceRepository->campaignPerformance($accountId, false) as $item) {
-            $ccp = new CacheCampaignPerformance(
-                $accountId,
-                $item['impressions'],
-                $item['clicks'],
-                $item['id'],
-                $item['baseUnitCost'],
-                $item['startDt']
-            );
+            $ccp = CacheCampaignPerformance::createFromArray($accountId, $item);
             $this->em->persist($ccp);
         }
         $this->em->flush();
+        echo "Reload cacheCampaignPerformance\n";
+
+        $q = $this->em->createQuery('delete from AppBundle:Cache\CacheAdGroupStats a where a.accountId = :accountId');
+        $q->setParameter('accountId', $accountId);
+        $q->execute();
         foreach ($this->campaignPerformanceRepository->adgroupStats($accountId, false) as $item) {
-            $cas = new CacheAdGroupStats(
-                $accountId,
-                $item['impressions'],
-                $item['clicks'],
-                $item['id'],
-                $item['baseUnitCost'],
-                $item['name'],
-                $item['adgroup'],
-                $item['adgroupId']
-            );
+            $cas = CacheAdGroupStats::createFromArray($accountId, $item);
             $this->em->persist($cas);
         }
         $this->em->flush();
-         foreach ($this->campaignPerformanceRepository->campaignStats($accountId, false) as $item) {
-            $ccs = new CacheCampaignStats(
-                $accountId,
-                $item['impressions'],
-                $item['clicks'],
-                $item['id'],
-                $item['baseUnitCost'],
-                $item['name'],
-                $item['campaign'],
-                $item['campaignId']
-            );
+        echo "Reload cacheAddGroupStats\n";
+
+        $q = $this->em->createQuery('delete from AppBundle:Cache\CacheCampaignStats a where a.accountId = :accountId');
+        $q->setParameter('accountId', $accountId);
+        $q->execute();
+        foreach ($this->campaignPerformanceRepository->campaignStats($accountId, false) as $item) {
+            $ccs = CacheCampaignStats::createFromArray($accountId, $item);
             $this->em->persist($ccs);
         }
         $this->em->flush();
+        echo "Reload cacheCampaignStats\n";
+
+        $q = $this->em->createQuery('delete from AppBundle:Cache\CacheSkuStats a where a.accountId = :accountId');
+        $q->setParameter('accountId', $accountId);
+        $q->execute();
+        foreach ($this->campaignPerformanceRepository->skuStats($accountId, false) as $item) {
+            $css = CacheSkuStats::createFromArray($accountId, $item);
+            $this->em->persist($css);
+        }
+        $this->em->flush();
+        echo "Reload cacheSkuStats\n";
     }
 
 }

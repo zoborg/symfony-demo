@@ -14,7 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks
  */
-class CacheAdGroupStats extends Common
+class CacheAdGroupStats extends CacheBase
 {
     /**
      * @param $accountId
@@ -56,6 +56,7 @@ class CacheAdGroupStats extends Common
         $adGroup,
         $adGroupId
     ) {
+        parent::__construct($accountId, $impressions, $clicks, $skuId, $baseUnitCost);
         $this->accountId = $accountId;
         $this->impressions = $impressions;
         $this->clicks = $clicks;
@@ -67,53 +68,9 @@ class CacheAdGroupStats extends Common
     }
 
     /**
-     * @var integer
-     *
-     * @ORM\Column(type="integer", nullable=false)
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $id;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(type="integer")
-     */
-    private $accountId;
-
-    /**
      * @var string
      *
-     * @ORM\Column(type="string")
-     */
-    private $impressions;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(type="integer")
-     */
-    private $clicks;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(type="integer")
-     */
-    private $skuId;
-
-    /**
-     * @var float
-     *
-     * @ORM\Column(type="float")
-     */
-    private $baseUnitCost;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", name="adgroup")
      */
     private $adGroup;
 
@@ -127,7 +84,7 @@ class CacheAdGroupStats extends Common
     /**
      * @var integer
      *
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", name="adgroup_id")
      */
     private $adGroupId;
 }

@@ -14,7 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks
  */
-class CacheCampaignPerformance extends Common
+class CacheCampaignPerformance extends CacheBase
 {
     /**
      * @param $accountId
@@ -40,59 +40,11 @@ class CacheCampaignPerformance extends Common
         $baseUnitCost,
         \DateTime $startDt
     ) {
-        $this->accountId = $accountId;
-        $this->impressions = $impressions;
-        $this->clicks = $clicks;
-        $this->skuId = $skuId;
-        $this->baseUnitCost = $baseUnitCost;
+        parent::__construct($accountId, $impressions, $clicks, $skuId, $baseUnitCost);
         if($startDt){
             $this->startDt = $startDt;
         }
     }
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(type="integer", nullable=false)
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $id;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(type="integer")
-     */
-    private $accountId;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(type="string")
-     */
-    private $impressions;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(type="integer")
-     */
-    private $clicks;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(type="integer")
-     */
-    private $skuId;
-
-    /**
-     * @var float
-     *
-     * @ORM\Column(type="float")
-     */
-    private $baseUnitCost;
 
     /**
      * @var \DateTime

@@ -25,6 +25,7 @@ Installation
 >     $ git clone https://github.com/zoborg/symfony-demo
 >     $ cd symfony-demo/
 >     $ composer install --no-interaction
+>     $ ./bin/console d:s:up --force   
 
 When you have read below you should execute below (this may take some time to load).
 

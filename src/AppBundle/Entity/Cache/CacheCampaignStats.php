@@ -14,7 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks
  */
-class CacheCampaignStats extends Common
+class CacheCampaignStats extends CacheBase
 {
     /**
      * @param $accountId
@@ -56,59 +56,11 @@ class CacheCampaignStats extends Common
         $campaign,
         $campaignId
     ) {
-        $this->accountId = $accountId;
-        $this->impressions = $impressions;
-        $this->clicks = $clicks;
-        $this->skuId = $skuId;
-        $this->baseUnitCost = $baseUnitCost;
+        parent::__construct($accountId, $impressions, $clicks, $skuId, $baseUnitCost);
         $this->name = $name;
         $this->campaign = $campaign;
         $this->campaignId = $campaignId;
     }
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(type="integer", nullable=false)
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $id;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(type="integer")
-     */
-    private $accountId;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(type="string")
-     */
-    private $impressions;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(type="integer")
-     */
-    private $clicks;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(type="integer")
-     */
-    private $skuId;
-
-    /**
-     * @var float
-     *
-     * @ORM\Column(type="float")
-     */
-    private $baseUnitCost;
 
     /**
      * @var string
@@ -127,7 +79,7 @@ class CacheCampaignStats extends Common
     /**
      * @var integer
      *
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", name="campaign_id")
      */
     private $campaignId;
 }

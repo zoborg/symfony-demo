@@ -14,7 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks
  */
-class CacheSkuStats extends Common
+class CacheSkuStats extends CacheBase
 {
     /**
      * @param $accountId
@@ -71,11 +71,7 @@ class CacheSkuStats extends Common
         $category,
         $brand
     ) {
-        $this->accountId = $accountId;
-        $this->impressions = $impressions;
-        $this->clicks = $clicks;
-        $this->skuId = $skuId;
-        $this->baseUnitCost = $baseUnitCost;
+        parent::__construct($accountId, $impressions, $clicks, $skuId, $baseUnitCost);
         $this->sku = $sku;
         $this->name = $name;
         $this->image = $image;
@@ -85,50 +81,6 @@ class CacheSkuStats extends Common
         $this->category = $category;
         $this->brand = $brand;
     }
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(type="integer", nullable=false)
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $id;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(type="integer")
-     */
-    private $accountId;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(type="string")
-     */
-    private $impressions;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(type="integer")
-     */
-    private $clicks;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(type="integer")
-     */
-    private $skuId;
-
-    /**
-     * @var float
-     *
-     * @ORM\Column(type="float")
-     */
-    private $baseUnitCost;
 
     /**
      * @var string

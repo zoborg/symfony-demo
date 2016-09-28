@@ -11,6 +11,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Entity\Accounts;
 use AppBundle\Utils\CampaignPerformanceProcessor;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -50,6 +51,7 @@ class LoadReportCommand extends ContainerAwareCommand
 
         $em = $this->getContainer()->get('doctrine')->getManager();
 
+        /** @var Accounts $account */
         $account = $em->getRepository('AppBundle:Accounts')->findOneBy(['username' => $username]);
         if(!$account) {
             die("Cannot load user");
@@ -57,6 +59,8 @@ class LoadReportCommand extends ContainerAwareCommand
             /** @var CampaignPerformanceProcessor $service */
             $service = $this->getContainer()->get('cpr');
             $service->processReport($file, $account);
+            //New action for reload cache table
+            $service->saveCache($account->getId());
         }
 
     }

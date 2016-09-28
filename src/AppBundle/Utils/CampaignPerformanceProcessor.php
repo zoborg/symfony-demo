@@ -134,7 +134,7 @@ class CampaignPerformanceProcessor
 
 
             $this->em->flush();
-            echo "Flushed at $entitiesCreated";
+            echo "Flushed at $entitiesCreated\n";
             foreach ($batches as $entity) {
                 $this->em->detach($entity);
             }
@@ -142,9 +142,7 @@ class CampaignPerformanceProcessor
 
             $time_end = microtime(true);
             $time = $time_end - $time_start;
-            echo "Account ".$accounts->getUsername()." took $time secs to load CPR";
-
-            $this->saveCache($accounts->getId());
+            echo "Account ".$accounts->getUsername()." took $time secs to load CPR\n";
         } catch (\Exception $e) {
             echo "Failed to load data ".$e->getMessage()."\n";
             echo $e->getTraceAsString();
@@ -154,7 +152,11 @@ class CampaignPerformanceProcessor
         return true;
     }
 
-    private function saveCache($accountId)
+    /**
+     * Save cache table
+     * @param integer $accountId
+     */
+    public function saveCache($accountId)
     {
         $q = $this->em->createQuery(
             'delete from AppBundle:Cache\CacheCampaignPerformance a where a.accountId = :accountId'

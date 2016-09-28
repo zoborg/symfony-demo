@@ -14,7 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Index(name="keyword", columns={"keyword", "accounts"}),
  * @ORM\Index(name="account", columns={"accounts"}),
  * })
- * @ORM\Entity(repositoryClass="CampaignPerformanceRepository") @ORM\HasLifecycleCallbacks
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\CampaignPerformanceRepository") @ORM\HasLifecycleCallbacks
  * @ORM\HasLifecycleCallbacks
  */
 class CampaignPerformance extends Common

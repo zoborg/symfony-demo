@@ -11,6 +11,8 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Entity\Accounts;
+use AppBundle\Utils\CampaignPerformanceProcessor;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -34,7 +36,6 @@ class LoadReportCommand extends ContainerAwareCommand
             // a good practice is to use the 'app:' prefix to group all your custom application commands
             ->setName('app:loadreport')
             ->setDescription('Loads a report');
-
     }
 
     /**
@@ -43,21 +44,21 @@ class LoadReportCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-
         $username = 'john_user';
         $file = __DIR__.'/../../../var/data/testdata.txt';
 
         $em = $this->getContainer()->get('doctrine')->getManager();
 
+        /** @var Accounts $account */
         $account = $em->getRepository('AppBundle:Accounts')->findOneBy(['username' => $username]);
         if(!$account) {
             die("Cannot load user");
         } else {
+            /** @var CampaignPerformanceProcessor $service */
             $service = $this->getContainer()->get('cpr');
-            $service->processReport($file, $account);
+            //$service->processReport($file, $account);
+            //New action for reload cache table
+            $service->saveCache($account->getId());
         }
-
     }
-
-
 }

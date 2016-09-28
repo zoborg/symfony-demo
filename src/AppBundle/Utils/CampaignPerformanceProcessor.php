@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: kkowlgi
- * Date: 19/1/16
- * Time: 4:29 AM
- */
-
 namespace AppBundle\Utils;
 
 
@@ -14,7 +7,7 @@ use AppBundle\Entity\Cache\CacheAdGroupStats;
 use AppBundle\Entity\Cache\CacheCampaignPerformance;
 use AppBundle\Entity\Cache\CacheCampaignStats;
 use AppBundle\Entity\Cache\CacheSkuStats;
-use AppBundle\Entity\CampaignPerformanceRepository;
+use AppBundle\Repository\CampaignPerformanceRepository;
 use AppBundle\Entity\Campaigns;
 use AppBundle\Entity\Adgroups;
 use AppBundle\Entity\CampaignPerformance;

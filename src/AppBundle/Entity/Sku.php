@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Table(name="sku")
  * @ORM\Entity
- * @ORM\Entity(repositoryClass="SkuRepository") @ORM\HasLifecycleCallbacks
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\SkuRepository") @ORM\HasLifecycleCallbacks
  */
 class Sku extends Common
 {

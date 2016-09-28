@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Table(name="campaigns", indexes={@ORM\Index(name="k_name", columns={"name"})})
  * @ORM\Entity
- * @ORM\Entity(repositoryClass="CampaignsRepository") @ORM\HasLifecycleCallbacks
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\CampaignsRepository") @ORM\HasLifecycleCallbacks
 
  */
 class Campaigns extends Common

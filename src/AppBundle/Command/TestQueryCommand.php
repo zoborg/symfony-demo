@@ -12,12 +12,11 @@
 namespace AppBundle\Command;
 
 use AppBundle\Entity\Accounts;
-use AppBundle\Entity\CampaignPerformanceRepository;
+use AppBundle\Repository\CampaignPerformanceRepository;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-
 
 
 class TestQueryCommand extends ContainerAwareCommand
@@ -83,12 +82,6 @@ class TestQueryCommand extends ContainerAwareCommand
             $final_time_end = microtime(true);
             $time = $final_time_end - $initial_time_start;
             echo "Total : $time \n";
-
-
-
         }
-
     }
-
-
 }

@@ -1,11 +1,12 @@
 <?php
 
-namespace AppBundle\Entity;
+namespace AppBundle\Repository;
 
 use AppBundle\Entity\Cache\CacheAdGroupStats;
 use AppBundle\Entity\Cache\CacheCampaignPerformance;
 use AppBundle\Entity\Cache\CacheCampaignStats;
 use AppBundle\Entity\Cache\CacheSkuStats;
+use AppBundle\Entity\CampaignPerformance;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\EntityRepository;
 
@@ -28,8 +29,8 @@ class CampaignPerformanceRepository extends EntityRepository
 
         if ($fromCache) {
             $qb = $this->getEntityManager()->createQueryBuilder();
-            $qb->from(CacheCampaignPerformance::class, 'a')
-                ->addSelect('a.impressions')
+            $qb->from(CacheCampaignPerformance::class, 'a');
+            $qb->select('a.impressions')
                 ->addSelect('a.clicks as clicks')
                 ->addSelect('a.skuId as id')
                 ->addSelect('a.baseUnitCost as baseUnitCost')
@@ -54,8 +55,6 @@ class CampaignPerformanceRepository extends EntityRepository
      */
     public function skuStats($accountId, $fromCache = true)
     {
-
-        $cacheName = md5($accountId.'skustats');
         $qb = $this->defaultQb($accountId);
         $qb->addSelect('e.sku as sku')
             ->addSelect('e.sku as name')
@@ -68,8 +67,8 @@ class CampaignPerformanceRepository extends EntityRepository
 
         if($fromCache) {
             $qb = $this->getEntityManager()->createQueryBuilder();
-            $qb->from(CacheSkuStats::class, 'a')
-            ->addSelect('a.impressions')
+            $qb->from(CacheSkuStats::class, 'a');
+            $qb->select('a.impressions')
                 ->addSelect('a.clicks as clicks')
                 ->addSelect('a.skuId as id')
                 ->addSelect('a.baseUnitCost as baseUnitCost')
@@ -85,8 +84,7 @@ class CampaignPerformanceRepository extends EntityRepository
                 ->setParameter('account', $accountId);
         }
 
-        $results = $qb->getQuery()->useResultCache(false, 3600, $cacheName)
-            ->getResult();
+        $results = $qb->getQuery()->getResult();
 
         return $results;
     }
@@ -107,8 +105,7 @@ class CampaignPerformanceRepository extends EntityRepository
         if($fromCache){
             $qb = $this->getEntityManager()->createQueryBuilder();
             $qb->from(CacheAdGroupStats::class, 'a');
-            $qb
-                ->addSelect('a.impressions')
+            $qb->select('a.impressions')
                 ->addSelect('a.clicks as clicks')
                 ->addSelect('a.skuId as id')
                 ->addSelect('a.baseUnitCost as baseUnitCost')
@@ -119,11 +116,7 @@ class CampaignPerformanceRepository extends EntityRepository
                 ->setParameter('account', $accountId);
 
         }
-        $results = $qb->getQuery()->useQueryCache(false)
-            ->useResultCache(false)
-            ->getResult();
-
-
+        $results = $qb->getQuery()->getResult();
         return $results;
     }
 
@@ -143,8 +136,7 @@ class CampaignPerformanceRepository extends EntityRepository
         if($fromCache){
              $qb = $this->getEntityManager()->createQueryBuilder();
             $qb->from(CacheCampaignStats::class, 'a');
-            $qb
-                ->addSelect('a.impressions')
+            $qb->select('a.impressions')
                 ->addSelect('a.clicks as clicks')
                 ->addSelect('a.skuId as id')
                 ->addSelect('a.baseUnitCost as baseUnitCost')
@@ -155,9 +147,7 @@ class CampaignPerformanceRepository extends EntityRepository
                 ->setParameter('account', $accountId);
         }
 
-        $results = $qb->getQuery()->useQueryCache(false)
-            ->useResultCache(false)
-            ->getResult();
+        $results = $qb->getQuery()->getResult();
 
         return $results;
     }
@@ -169,8 +159,7 @@ class CampaignPerformanceRepository extends EntityRepository
     private function defaultQb($accountId)
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
-        $qb->
-        select('sum(a.impressions) as impressions')
+        $qb->select('sum(a.impressions) as impressions')
             ->addSelect('sum(a.clicks) as clicks')
             ->addSelect('e.id as id')
             ->addSelect('e.unitCost as baseUnitCost')

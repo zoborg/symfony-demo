@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Adgroups
  *
  * @ORM\Entity
- * @ORM\Entity(repositoryClass="AdgroupsRepository") @ORM\HasLifecycleCallbacks
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\AdgroupsRepository") @ORM\HasLifecycleCallbacks
 
  */
 class Adgroups extends Common
